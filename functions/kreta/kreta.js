@@ -173,7 +173,7 @@ const resolvers = {
       const params = {
         institute_code: instituteCode,
         grant_type: 'password',
-        client_id: '919e0c1c-76a2-4646-a2fb-7085bbbf3c56',
+        client_id: process.env.KRETA_CLIENT_ID,
         userName: username,
         password: password
       };

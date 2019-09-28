@@ -7,7 +7,7 @@ class KretaGlobal extends RESTDataSource {
   }
 
   willSendRequest(request) {
-    request.headers.set('apiKey', '7856d350-1fda-45f5-822d-e1a2f3f1acf0');
+    request.headers.set('apiKey', process.env.KRETA_API_KEY);
   }
 
   async getInstitutes(query) {
