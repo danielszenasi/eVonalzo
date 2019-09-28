@@ -4,6 +4,7 @@ const { GraphQLScalarType } = require('graphql');
 const KretaGlobal = require('./apis/kreta-global.js');
 const Kreta = require('./apis/kreta.js');
 const fetch = require('node-fetch');
+const queryString = require('query-string');
 
 const typeDefs = gql`
   scalar Date
@@ -177,7 +178,7 @@ const resolvers = {
         userName: username,
         password: password
       };
-      const urlParams = new URLSearchParams(Object.entries(params));
+      const urlParams = queryString.stringify(params);
       const result = await fetch(
         `https://${instituteCode}.e-kreta.hu/idp/api/v1/Token`,
         {
