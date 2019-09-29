@@ -36,6 +36,7 @@
     "apollo-link-context": "^1.0.19",
     "chart.js": "^2.8.0",
     "clsx": "^1.0.4",
+    "date-fns": "^2.4.1",
     "graphql": "^14.5.8",
     "history": "^4.9.0",
     "moment": "^2.24.0",

@@ -1,9 +1,7 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/styles';
-import { Grid } from '@material-ui/core';
 import { gql } from 'apollo-boost';
-
-import { LatestProducts } from './components';
+import { Budget, TotalUsers } from './components';
 import { useQuery } from '@apollo/react-hooks';
 
 const GET_STUDENT = gql`
@@ -15,6 +13,23 @@ const GET_STUDENT = gql`
         NumberValue
         Date
         Mode
+        Theme
+      }
+      Notes {
+        NoteId
+        Type
+        Title
+        Content
+        SeenByTutelaryUTC
+        Teacher
+        Date
+      }
+      SubjectAverages {
+        SubjectId
+        Subject
+        Value
+        ClassValue
+        Difference
       }
     }
   }
@@ -33,36 +48,29 @@ const Dashboard = () => {
   if (loading || !data) return <p>Loading ...</p>;
   if (error) return <p>Error</p>;
 
-  console.log(data);
+  const evaluations = data.getStudent.Evaluations.reduce(
+    (group, evaluation) => {
+      if (group[evaluation.Subject]) {
+        return {
+          ...group,
+          [evaluation.Subject]: [...group[evaluation.Subject], evaluation]
+        };
+      }
+      return {
+        ...group,
+        [evaluation.Subject]: [evaluation]
+      };
+    },
+    {}
+  );
 
   return (
     <div className={classes.root}>
-      <Grid container spacing={4}>
-        {/* <Grid item lg={3} sm={6} xl={3} xs={12}>
-          <Budget />
-        </Grid>
-        <Grid item lg={3} sm={6} xl={3} xs={12}>
-          <TotalUsers />
-        </Grid>
-        <Grid item lg={3} sm={6} xl={3} xs={12}>
-          <TasksProgress />
-        </Grid>
-        <Grid item lg={3} sm={6} xl={3} xs={12}>
-          <TotalProfit />
-        </Grid>
-        <Grid item lg={8} md={12} xl={9} xs={12}>
-          <LatestSales />
-        </Grid>
-        <Grid item lg={4} md={6} xl={3} xs={12}>
-          <UsersByDevice />
-        </Grid> */}
-        <Grid item lg={4} md={6} xl={3} xs={12}>
-          <LatestProducts evaluations={data.getStudent.Evaluations} />
-        </Grid>
-        {/* <Grid item lg={8} md={12} xl={9} xs={12}>
-          <LatestOrders />
-        </Grid> */}
-      </Grid>
+      <TotalUsers
+        subjectAverages={data.getStudent.SubjectAverages}
+        evaluations={evaluations}
+      />
+      <Budget notes={data.getStudent.Notes} />
     </div>
   );
 };

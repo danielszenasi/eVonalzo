@@ -2,9 +2,15 @@ import React from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/styles';
-import { Card, CardContent, Grid, Typography, Avatar } from '@material-ui/core';
-import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
-import MoneyIcon from '@material-ui/icons/Money';
+import {
+  Card,
+  CardContent,
+  Typography,
+  CardHeader,
+  Grid
+} from '@material-ui/core';
+import { formatDistance } from 'date-fns';
+import huLocale from 'date-fns/locale/hu';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -16,79 +22,39 @@ const useStyles = makeStyles(theme => ({
   },
   title: {
     fontWeight: 700
-  },
-  avatar: {
-    backgroundColor: theme.palette.error.main,
-    height: 56,
-    width: 56
-  },
-  icon: {
-    height: 32,
-    width: 32
-  },
-  difference: {
-    marginTop: theme.spacing(2),
-    display: 'flex',
-    alignItems: 'center'
-  },
-  differenceIcon: {
-    color: theme.palette.error.dark
-  },
-  differenceValue: {
-    color: theme.palette.error.dark,
-    marginRight: theme.spacing(1)
   }
 }));
 
-const Budget = props => {
-  const { className, ...rest } = props;
-
+const Budget = ({ notes, className, ...rest }) => {
   const classes = useStyles();
 
   return (
-    <Card
-      {...rest}
-      className={clsx(classes.root, className)}
-    >
-      <CardContent>
-        <Grid
-          container
-          justify="space-between"
-        >
-          <Grid item>
-            <Typography
-              className={classes.title}
-              color="textSecondary"
-              gutterBottom
-              variant="body2"
-            >
-              BUDGET
-            </Typography>
-            <Typography variant="h3">$24,000</Typography>
+    <Grid container spacing={3}>
+      {notes.map(note => {
+        const created = formatDistance(new Date(note.Date), new Date(), {
+          locale: huLocale
+        });
+        return (
+          <Grid key={note.NoteId} item xs={12} sm={6}>
+            <Card {...rest} className={clsx(classes.root, className)}>
+              <CardHeader
+                title={note.Title}
+                subheader={note.Teacher}
+                action={created}
+              />
+              <CardContent>
+                <Typography
+                  className={classes.differenceValue}
+                  variant="body1"
+                  dangerouslySetInnerHTML={{
+                    __html: note.Content.replace(/\n/g, '<br />')
+                  }}></Typography>
+              </CardContent>
+            </Card>
           </Grid>
-          <Grid item>
-            <Avatar className={classes.avatar}>
-              <MoneyIcon className={classes.icon} />
-            </Avatar>
-          </Grid>
-        </Grid>
-        <div className={classes.difference}>
-          <ArrowDownwardIcon className={classes.differenceIcon} />
-          <Typography
-            className={classes.differenceValue}
-            variant="body2"
-          >
-            12%
-          </Typography>
-          <Typography
-            className={classes.caption}
-            variant="caption"
-          >
-            Since last month
-          </Typography>
-        </div>
-      </CardContent>
-    </Card>
+        );
+      })}
+    </Grid>
   );
 };
 

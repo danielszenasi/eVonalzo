@@ -1,99 +1,125 @@
 import React from 'react';
 import clsx from 'clsx';
-import PropTypes from 'prop-types';
+
 import { makeStyles } from '@material-ui/styles';
-import { Card, CardContent, Grid, Typography, Avatar } from '@material-ui/core';
+import {
+  Card,
+  CardContent,
+  Grid,
+  Typography,
+  Divider,
+  CardHeader
+} from '@material-ui/core';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
-import PeopleIcon from '@material-ui/icons/PeopleOutlined';
+import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
+import { formatDistance } from 'date-fns';
+import huLocale from 'date-fns/locale/hu';
 
 const useStyles = makeStyles(theme => ({
-  root: {
-    height: '100%'
-  },
-  content: {
-    alignItems: 'center',
-    display: 'flex'
-  },
   title: {
-    fontWeight: 700
+    fontWeight: 700,
+    textTransform: 'uppercase'
   },
-  avatar: {
-    backgroundColor: theme.palette.success.main,
-    height: 56,
-    width: 56
-  },
-  icon: {
-    height: 32,
-    width: 32
-  },
-  difference: {
-    marginTop: theme.spacing(2),
+  evaluationContainer: {
     display: 'flex',
-    alignItems: 'center'
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderTopStyle: 'solid',
+    borderTopWidth: '1px',
+    borderTopColor: theme.palette.grey[200],
+    paddingTop: '6px',
+    marginTop: '6px',
+    '&:first-child': {
+      borderTop: 'none',
+      paddingTop: 0,
+      marginTop: 0
+    }
   },
-  differenceIcon: {
+  evaluationValue: {
+    width: '50px'
+  },
+  evaluationInfo: {
+    flex: 1
+  },
+  differenceNegative: {
+    color: theme.palette.error.dark
+  },
+  differencePositive: {
     color: theme.palette.success.dark
   },
-  differenceValue: {
-    color: theme.palette.success.dark,
-    marginRight: theme.spacing(1)
+  cardActionContainer: {
+    display: 'flex'
   }
 }));
 
-const TotalUsers = props => {
-  const { className, ...rest } = props;
-
+const TotalUsers = ({ subjectAverages, evaluations }) => {
   const classes = useStyles();
+  console.log(evaluations);
 
   return (
-    <Card
-      {...rest}
-      className={clsx(classes.root, className)}
-    >
-      <CardContent>
-        <Grid
-          container
-          justify="space-between"
-        >
-          <Grid item>
-            <Typography
-              className={classes.title}
-              color="textSecondary"
-              gutterBottom
-              variant="body2"
-            >
-              TOTAL USERS
-            </Typography>
-            <Typography variant="h3">1,600</Typography>
-          </Grid>
-          <Grid item>
-            <Avatar className={classes.avatar}>
-              <PeopleIcon className={classes.icon} />
-            </Avatar>
-          </Grid>
+    <Grid container spacing={3}>
+      {subjectAverages.map(subjectAverage => (
+        <Grid item xs={12} sm={6} md={4} lg={3} key={subjectAverage.SubjectId}>
+          <Card className={classes.card}>
+            <CardHeader
+              title={subjectAverage.Subject}
+              action={
+                <div className={classes.cardActionContainer}>
+                  <Typography variant="h5">{subjectAverage.Value}</Typography>
+                  <div
+                    className={clsx([
+                      subjectAverage.Difference > 0
+                        ? classes.differencePositive
+                        : classes.differenceNegative
+                    ])}>
+                    {subjectAverage.Difference > 0 ? (
+                      <ArrowUpwardIcon />
+                    ) : (
+                      <ArrowDownwardIcon />
+                    )}
+                    <Typography variant="caption" color="inherit">
+                      {subjectAverage.Difference}
+                    </Typography>
+                  </div>
+                </div>
+              }
+            />
+            <Divider />
+            <CardContent>
+              {evaluations[subjectAverage.Subject] &&
+                evaluations[subjectAverage.Subject].map(evaluation => {
+                  const created = formatDistance(
+                    new Date(evaluation.Date),
+                    new Date(),
+                    {
+                      locale: huLocale
+                    }
+                  );
+                  return (
+                    <div
+                      key={evaluation.EvaluationId}
+                      className={classes.evaluationContainer}>
+                      <Typography
+                        variant="h2"
+                        className={classes.evaluationValue}>
+                        {evaluation.NumberValue}
+                      </Typography>
+                      <div className={classes.evaluationInfo}>
+                        <Typography variant="h5">{evaluation.Mode}</Typography>
+                        <Typography variant="h6">{evaluation.Theme}</Typography>
+                      </div>
+                      <div>
+                        <Typography variant="caption">{created}</Typography>
+                      </div>
+                    </div>
+                  );
+                })}
+            </CardContent>
+          </Card>
         </Grid>
-        <div className={classes.difference}>
-          <ArrowUpwardIcon className={classes.differenceIcon} />
-          <Typography
-            className={classes.differenceValue}
-            variant="body2"
-          >
-            16%
-          </Typography>
-          <Typography
-            className={classes.caption}
-            variant="caption"
-          >
-            Since last month
-          </Typography>
-        </div>
-      </CardContent>
-    </Card>
+      ))}
+    </Grid>
   );
-};
-
-TotalUsers.propTypes = {
-  className: PropTypes.string
 };
 
 export default TotalUsers;
