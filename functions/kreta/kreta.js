@@ -145,7 +145,7 @@ const typeDefs = gql`
   type Query {
     getInstitutes(query: String): [Institute]
     getStudent: Student
-    getLessons: [Lesson]
+    getLessons(start: String!, end: String!): [Lesson]
   }
   type Mutation {
     login(
@@ -163,8 +163,8 @@ const resolvers = {
     getStudent: async (_, _params, { dataSources }) => {
       return dataSources.Kreta.getStudent();
     },
-    getLessons: async (_, _params, { dataSources }) => {
-      return dataSources.Kreta.getLessons();
+    getLessons: async (_, { start, end }, { dataSources }) => {
+      return dataSources.Kreta.getLessons(start, end);
     }
   },
   Mutation: {

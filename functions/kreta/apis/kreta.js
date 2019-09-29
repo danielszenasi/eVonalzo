@@ -21,8 +21,13 @@ class Kreta extends RESTDataSource {
     return this.get(`/BejelentettSzamonkeres`);
   }
 
-  async getLessons() {
-    return this.get(`/Lesson`, { fromDate: '2018-09-09', toDate: '2018-09-10' });
+  async getLessons(start, end) {
+    console.log(start, end);
+
+    return this.get(`/Lesson`, {
+      fromDate: start,
+      toDate: end
+    });
   }
 
   async getHomework(homeworkId) {
